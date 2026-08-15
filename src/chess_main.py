@@ -22,7 +22,8 @@ def main():
     gs = chess_engine.GameState()
     running = True
     validMoves = gs.getValidMoves()
-
+    """Move made created so that valid moves can only be created when a move is made not in every frame"""
+    moveMade = False
     loadImages()
     square_selected = ()
     """This will contain max of two elements which tell what was the first click and the second,
@@ -37,6 +38,10 @@ def main():
             if e.type == p.KEYDOWN:
                 if e.key == p.K_LEFT:
                     gs.undoMove()
+                    """As we know game state changed so generate moves again
+                    we can also do validMoves = gs.generateValidMoves()
+                    """
+                    moveMade = True
             #mouse handler
             if e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos() #Exact coordinate of mouse click
@@ -50,12 +55,19 @@ def main():
                     square_selected = (row,col)
                     player_click.append(square_selected)
                 if len(player_click) == 2:
+                    """Move object created"""
                     move = chess_engine.Move(player_click[0],player_click[1],gs.board)
-                    gs.makeMove(move)
+                    """If move is valid move"""
                     print(move.getChessNotation())
+                    if move in validMoves:
+                        gs.makeMove(move)
+                        moveMade = True
                     player_click = []
                     square_selected = ()
-
+        """Move made is true which game state change generate new valid moves"""
+        if moveMade:
+            validMoves = gs.getValidMoves()
+            moveMade = False
         drawGameState(screen,gs)
         clock.tick(MAX_FPS)
         p.display.flip()
