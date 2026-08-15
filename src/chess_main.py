@@ -43,7 +43,9 @@ def main():
                     square_selected = (row,col)
                     player_click.append(square_selected)
                 if len(player_click) == 2:
-
+                    move = chess_engine.Move(player_click[0],player_click[1],gs.board)
+                    gs.makeMove(move)
+                    print(move.getChessNotation())
                     player_click = []
                     square_selected = ()
 
