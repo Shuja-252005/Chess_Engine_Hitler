@@ -31,6 +31,9 @@ def main():
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
+            if e.type == p.KEYDOWN:
+                if e.key == p.K_LEFT:
+                    gs.undoMove()
             if e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos() #Exact coordinate of mouse click
                 col = location[0] // SQ_SIZE #64 pixel x axis
