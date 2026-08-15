@@ -21,6 +21,8 @@ def main():
     screen.fill(p.Color("white"))
     gs = chess_engine.GameState()
     running = True
+    validMoves = gs.getValidMoves()
+
     loadImages()
     square_selected = ()
     """This will contain max of two elements which tell what was the first click and the second,
@@ -31,9 +33,11 @@ def main():
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
+            #key handler
             if e.type == p.KEYDOWN:
                 if e.key == p.K_LEFT:
                     gs.undoMove()
+            #mouse handler
             if e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos() #Exact coordinate of mouse click
                 col = location[0] // SQ_SIZE #64 pixel x axis

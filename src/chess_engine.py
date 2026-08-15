@@ -20,11 +20,37 @@ class GameState:
         self.white_to_move = not self.white_to_move
 
     def undoMove(self):
-        if len(self.move_log) > 0:
+        if len(self.move_log) != 0:
             move = self.move_log.pop()
             self.board[move.start_row][move.start_col] = move.piece_moved
             self.board[move.end_row][move.end_col] = move.piece_captured
             self.white_to_move = not self.white_to_move
+
+    """Method for all moves with checks and stuff"""
+    def getValidMoves(self):
+        return self.getAllPossibleMoves
+
+    """All possible moves"""
+    def getAllPossibleMoves(self):
+        moves = []
+        for r in range(len(self.board)):
+            for c in range((len(self.board[r]))):
+                piece = self.board[r][c]
+                if piece == "--":
+                    continue
+                color = piece[0]
+                kind = piece[1]
+
+                if (color == "w" and self.white_to_move) or (color == "b" and not self.white_to_move):
+                    if kind == "p":
+                        self.allPawnMoves(r,c,moves)
+
+
+
+    """All possible pawn moves"""
+    def allPawnMoves(self,r,c,moves):
+        pass
+
 
 
 class Move:
