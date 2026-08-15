@@ -8,22 +8,23 @@ SQ_SIZE = HEIGHT // DIMENSIONS
 IMAGES = {}
 MAX_FPS = 15
 
+
 def loadImages():
-    pieces = ["wr","wn","wb","wq","wk","wp","bR","bN","bB","bQ","bK","bP"]
+    pieces = ["wr", "wn", "wb", "wq", "wk", "wp", "bR", "bN", "bB", "bQ", "bK", "bP"]
     for piece in pieces:
-        IMAGES[piece] = p.transform.scale(p.image.load("images/"+piece+".png"),(SQ_SIZE,SQ_SIZE))
+        IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE))
 
 
 def main():
     p.init()
-    screen = p.display.set_mode((WIDTH,HEIGHT))
+    screen = p.display.set_mode((WIDTH, HEIGHT))
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     gs = chess_engine.GameState()
     running = True
-    validMoves = gs.getValidMoves()
+    valid_moves = gs.getValidMoves()
     """Move made created so that valid moves can only be created when a move is made not in every frame"""
-    moveMade = False
+    move_made = False
     loadImages()
     square_selected = ()
     """This will contain max of two elements which tell what was the first click and the second,
@@ -34,70 +35,69 @@ def main():
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
-            #key handler
+            # key handler
             if e.type == p.KEYDOWN:
                 if e.key == p.K_LEFT:
                     gs.undoMove()
                     """As we know game state changed so generate moves again
-                    we can also do validMoves = gs.generateValidMoves()
+                    we can also do valid_moves = gs.generateValidMoves()
                     """
-                    moveMade = True
-            #mouse handler
+                    move_made = True
+            # mouse handler
             if e.type == p.MOUSEBUTTONDOWN:
-                location = p.mouse.get_pos() #Exact coordinate of mouse click
-                col = location[0] // SQ_SIZE #64 pixel x axis
-                row = location[1] // SQ_SIZE #64 pixel x axis
+                location = p.mouse.get_pos()  # Exact coordinate of mouse click
+                col = location[0] // SQ_SIZE  # 64 pixel x axis
+                row = location[1] // SQ_SIZE  # 64 pixel x axis
                 """Checks if double clicked means if you click piece twice it deselects"""
-                if square_selected == (row,col):
+                if square_selected == (row, col):
                     square_selected = ()
                     player_click = []
                 else:
-                    square_selected = (row,col)
+                    square_selected = (row, col)
                     player_click.append(square_selected)
                 if len(player_click) == 2:
                     """Move object created"""
-                    move = chess_engine.Move(player_click[0],player_click[1],gs.board)
+                    move = chess_engine.Move(player_click[0], player_click[1], gs.board)
                     """If move is valid move"""
                     print(move.getChessNotation())
-                    if move in validMoves:
+                    if move in valid_moves:
                         gs.makeMove(move)
-                        moveMade = True
-                    player_click = []
+                        move_made = True
+                    player_click = [square_selected]
                     square_selected = ()
         """Move made is true which game state change generate new valid moves"""
-        if moveMade:
-            validMoves = gs.getValidMoves()
-            moveMade = False
-        drawGameState(screen,gs)
+        if move_made:
+            valid_moves = gs.getValidMoves()
+            move_made = False
+
+        drawGameState(screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
 
 
-def drawGameState(screen,gs):
+def drawGameState(screen, gs):
     drawBoard(screen)
-    drawPieces(gs.board,screen)
+    drawPieces(gs.board, screen)
 
 
-def drawPieces(board,screen):
+def drawPieces(board, screen):
     for r in range(DIMENSIONS):
         for c in range(DIMENSIONS):
             piece = board[r][c]
             if piece != "--":
-                screen.blit(IMAGES[piece],p.Rect(c*SQ_SIZE,r*SQ_SIZE,SQ_SIZE,SQ_SIZE))
-
+                screen.blit(IMAGES[piece], p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 
 def drawBoard(screen):
-    colors = [p.Color("white"),p.Color("light blue")]
+    colors = [p.Color("white"), p.Color("light blue")]
     for r in range(DIMENSIONS):
         for c in range(DIMENSIONS):
             # all light square sum of coordinates are even number and dark squares are odd
-            if (r+c) % 2 == 0:
+            if (r + c) % 2 == 0:
                 color = colors[0]
             else:
                 color = colors[1]
-            p.draw.rect(screen,color,p.Rect(c*SQ_SIZE,r*SQ_SIZE,SQ_SIZE,SQ_SIZE))
-
+            p.draw.rect(screen, color, p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 
 if __name__ == "__main__":

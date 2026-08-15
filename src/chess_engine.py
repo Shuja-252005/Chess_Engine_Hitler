@@ -1,19 +1,21 @@
+from operator import truediv
+
+
 class GameState:
 
-
     def __init__(self):
-        self.board = [["bR","bN","bB","bQ","bK","bB","bN","bR"],
-                 ["bP","bP","bP","bP","bP","bP","bP","bP"],
-                 ["--","--","--","--","--","--","--","--"],
-                 ["--","--","--","--","--","--","--","--"],
-                 ["--","--","--","--","--","--","--","--"],
-                 ["--","--","--","--","--","--","--","--"],
-                 ["wp","wp","wp","wp","wp","wp","wp","wp"],
-                 ["wr","wn","wb","wq","wk","wb","wn","wr"],]
+        self.board = [["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
+                      ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
+                      ["--", "--", "--", "--", "--", "--", "--", "--"],
+                      ["--", "--", "--", "--", "--", "--", "--", "--"],
+                      ["--", "--", "--", "--", "--", "--", "--", "--"],
+                      ["--", "--", "bQ", "--", "--", "--", "--", "--"],
+                      ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
+                      ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"], ]
         self.move_log = []
         self.white_to_move = True
 
-    def makeMove(self,move):
+    def makeMove(self, move):
         self.board[move.start_row][move.start_col] = "--"
         self.board[move.end_row][move.end_col] = move.piece_moved
         self.move_log.append(move)
@@ -27,12 +29,14 @@ class GameState:
             self.white_to_move = not self.white_to_move
 
     """Method for all moves with checks and stuff"""
+
     def getValidMoves(self):
         return self.getAllPossibleMoves()
 
     """All possible moves"""
+
     def getAllPossibleMoves(self):
-        moves = [Move((7,7),(3,3),self.board)]
+        moves = []
         for r in range(len(self.board)):
             for c in range((len(self.board[r]))):
                 piece = self.board[r][c]
@@ -42,24 +46,72 @@ class GameState:
                 kind = piece[1]
 
                 if (color == "w" and self.white_to_move) or (color == "b" and not self.white_to_move):
-                    if kind == "p":
-                        self.allPawnMoves(r,c,moves)
+                    """lower() used for both white pawns (p) and black pawns (P)"""
+                    if kind.lower() == "p":
+                        self.allPawnMoves(r, c, moves)
+
         return moves
 
-
-
     """All possible pawn moves"""
-    def allPawnMoves(self,r,c,moves):
-        pass
+    def allPawnMoves(self, r, c, moves):
+        piece = self.board[r][c]
+        color = piece[0]
 
+        if color == "w":
+            first_move = r == 6
+            if first_move:
+                """First 1 and 2 moves up straight"""
+                for i in range(1, 3):
+                    """check if move within chess boards and on empty square"""
+                    if self.withInChessBoard(r - i, c) and (self.board[r - i][c] == "--"):
+                        move = Move((r, c), (r - i, c), self.board)
+                        moves.append(move)
+            else:
+                """Only one move up because already moved"""
+                if self.withInChessBoard(r - 1, c) and (self.board[r - 1][c] == "--"):
+                    move = Move((r, c), (r - 1, c), self.board)
+                    moves.append(move)
+            """For Left diagonal move"""
+            if self.withInChessBoard(r - 1, c - 1) and self.board[r - 1][c - 1][0] == "b":
+                move1 = Move((r, c), (r - 1, c - 1), self.board)
+                moves.append(move1)
+            """For Right diagonal move"""
+            if self.withInChessBoard(r - 1, c + 1) and self.board[r - 1][c + 1][0] == "b":
+                move2 = Move((r, c), (r - 1, c + 1), self.board)
+                moves.append(move2)
+        else:
+            first_move = r == 1
+            if first_move:
+                """First 1 and 2 moves down straight"""
+                for i in range(1, 3):
+                    """check if move within chess boards and on empty square"""
+                    if self.withInChessBoard(r + i, c) and (self.board[r + i][c] == "--"):
+                        move = Move((r, c), (r + i, c), self.board)
+                        moves.append(move)
+            else:
+                """Only one move up because already moved"""
+                if self.withInChessBoard(r + 1, c) and (self.board[r + 1][c] == "--"):
+                    move = Move((r, c), (r + 1, c), self.board)
+                    moves.append(move)
+            """For Left diagonal move"""
+            if self.withInChessBoard(r + 1, c + 1) and self.board[r + 1][c + 1][0] == "w":
+                move1 = Move((r, c), (r + 1, c + 1), self.board)
+                moves.append(move1)
+            """For Right diagonal move"""
+            if self.withInChessBoard(r + 1, c - 1) and self.board[r + 1][c - 1][0] == "w":
+                move2 = Move((r, c), (r + 1, c - 1), self.board)
+                moves.append(move2)
+
+
+    def withInChessBoard(self, r, c):
+        return 0 <= r < 8 and 0 <= c < 8
 
 
 class Move:
     rowsToRank = {0: "8", 1: "7", 2: "6", 3: "5", 4: "4", 5: "3", 6: "2", 7: "1"}
     colsToFiles = {0: "a", 1: "b", 2: "c", 3: "d", 4: "e", 5: "f", 6: "g", 7: "h"}
 
-
-    def __init__(self,start_pos,end_pos,board):
+    def __init__(self, start_pos, end_pos, board):
         self.start_row = start_pos[0]
         self.start_col = start_pos[1]
         self.end_row = end_pos[0]
@@ -68,20 +120,18 @@ class Move:
         self.piece_captured = board[self.end_row][self.end_col]
 
     """The chess notation is the notation for the complete move like (bp at a4 ---- wP at b3"""
+
     def getChessNotation(self):
-        return self.getRankFile(self.start_row,self.start_col) +self.getRankFile(self.end_row,self.end_col)
+        return self.getRankFile(self.start_row, self.start_col) + self.getRankFile(self.end_row, self.end_col)
 
-
-    def getRankFile(self,r,c):
+    def getRankFile(self, r, c):
         return self.colsToFiles[c] + self.rowsToRank[r]
 
     def __eq__(self, other):
-        if isinstance(other,Move):
+        if isinstance(other, Move):
             return (other.start_row == self.start_row and
                     other.start_col == self.start_col and
                     other.end_col == self.end_col and
                     other.end_row == self.end_row)
         else:
             return False
-
-
