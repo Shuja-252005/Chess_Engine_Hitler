@@ -6,9 +6,9 @@ class GameState:
     def __init__(self):
         self.board = [["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
                       ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
+                      ["--", "bP", "--", "--", "--", "wp", "--", "--"],
                       ["--", "--", "--", "--", "--", "--", "--", "--"],
-                      ["--", "--", "--", "--", "--", "--", "--", "--"],
-                      ["--", "wr", "--", "--", "--", "--", "wp", "--"],
+                      ["--", "--", "--", "wq", "--", "--", "--", "--"],
                       ["--", "--", "--", "--", "--", "--", "--", "--"],
                       ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
                       ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"], ]
@@ -40,12 +40,14 @@ class GameState:
         moves = []
         for r in range(len(self.board)):
             for c in range((len(self.board[r]))):
-                piece = self.board[r][c]
-                if piece == "--":
-                    continue
-                kind = piece[1].lower()
-                print(kind)
-                self.moveFunction[kind](r,c,moves)
+                if self.white_to_move and self.board[r][c][0] == "w":
+                    piece = self.board[r][c]
+                    kind = piece[1].lower()
+                    self.moveFunction[kind](r,c,moves)
+                elif not self.white_to_move and self.board[r][c][0] == "b":
+                    piece = self.board[r][c]
+                    kind = piece[1].lower()
+                    self.moveFunction[kind](r, c, moves)
 
         return moves
 
@@ -183,7 +185,7 @@ class GameState:
             for i in range(1,8):
                 end_row = r + d[0] * i
                 end_col = c + d[1] * i
-                if 0 <= end_row < 8 and 0 <= end_col < 8:
+                if self.withInChessBoard(end_row,end_col):
                     if self.board[end_row][end_col] == "--":
                         moves.append(Move((r,c),(end_row,end_col),self.board))
                     elif self.board[end_row][end_col][0] == enemy_color:
@@ -195,21 +197,31 @@ class GameState:
                     break # Off the chess board
 
 
-
-
-
-
-
-
-
     def allBishopMoves(self,r,c,moves):
-        pass
+        direction = ((-1, -1), (1, 1), (1, -1), (-1, 1)) # Top Left, Bottom Right, Bottom Left, Top Right
+        enemy_color = "b" if self.white_to_move else "w"
+        for d in direction:
+            for i in range(1, 8):
+                end_row = r + d[0] * i
+                end_col = c + d[1] * i
+                if self.withInChessBoard(end_row,end_col):
+                    if self.board[end_row][end_col] == "--":
+                        moves.append(Move((r, c), (end_row, end_col), self.board))
+                    elif self.board[end_row][end_col][0] == enemy_color:
+                        moves.append(Move((r, c), (end_row, end_col), self.board))
+                        break
+                    else:
+                        break  # if a friendly piece present
+                else:
+                    break  # Off the chess board
+
 
     def allKnightMoves(self,r,c,moves):
         pass
 
     def allQueenMoves(self,r,c,moves):
-        pass
+        self.allRookMoves(r,c,moves)
+        self.allBishopMoves(r,c,moves)
 
     def allKingMoves(self,r,c,moves):
         pass
