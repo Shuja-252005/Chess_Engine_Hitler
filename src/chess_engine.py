@@ -44,6 +44,7 @@ class GameState:
                 if piece == "--":
                     continue
                 kind = piece[1].lower()
+                print(kind)
                 self.moveFunction[kind](r,c,moves)
 
         return moves
@@ -127,7 +128,36 @@ class GameState:
 
 
     def allRookMoves(self,r,c,moves):
-        pass
+        if self.white_to_move and self.board[r][c][0] == "w":
+            changing_square = c
+            while changing_square + 1 < 8:# right Moves
+                print("Ahmed")
+                changing_square += 1
+                if self.board[r][changing_square][0] == "w": #If white pawn dont add that square
+                    break
+                elif self.board[r][changing_square][0] == "b": # if black pawn add that move
+                    moves.append(Move((r, c), (r, changing_square), self.board))
+                    break
+                else: # if nothing add that move
+                    moves.append(Move((r, c), (r, changing_square), self.board))
+
+            changing_square = c
+            while changing_square - 1 >= 0:# Left Moves
+                print("shuja")
+                changing_square -= 1
+                if self.board[r][changing_square][0] == "w": #If white pawn dont add that square
+                    break
+                elif self.board[r][changing_square][0] == "b": # if black pawn add that move
+                    moves.append(Move((r, c), (r, changing_square), self.board))
+                    break
+                else: # if nothing add that move
+                    moves.append(Move((r, c), (r, changing_square), self.board))
+
+
+
+
+
+
 
     def allBishopMoves(self,r,c,moves):
         pass
