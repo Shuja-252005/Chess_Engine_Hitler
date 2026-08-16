@@ -4,24 +4,44 @@ from operator import truediv
 class GameState:
 
     def __init__(self):
-        self.board = [["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
-                      ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
-                      ["--", "--", "--", "--", "--", "--", "--", "--"],
-                      ["--", "--", "--", "--", "--", "--", "--", "--"],
-                      ["--", "--", "--", "--", "--", "--", "--", "--"],
-                      ["--", "--", "--", "--", "--", "--", "--", "--"],
-                      ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
-                      ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"], ]
+        # self.board = \
+        #     [["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
+        #               ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
+        #               ["--", "--", "--", "--", "--", "--", "--", "--"],
+        #               ["--", "--", "--", "--", "--", "--", "--", "--"],
+        #               ["--", "--", "--", "--", "--", "--", "--", "--"],
+        #               ["--", "--", "--", "--", "--", "--", "--", "--"],
+        #               ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
+        #               ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"], ]
+        self.board =  [
+    ["--", "--", "--", "--", "--", "--", "--", "--"],
+    ["--", "--", "--", "--", "bK", "--", "--", "--"],
+    ["--", "--", "--", "--", "--", "--", "--", "--"],
+    ["--", "--", "--", "wp", "--", "--", "--", "--"],
+    ["--", "--", "--", "--", "--", "--", "--", "--"],
+    ["--", "--", "--", "--", "--", "--", "--", "--"],
+    ["--", "--", "--", "--", "--", "--", "--", "--"],
+    ["--", "--", "--", "--", "--", "--", "--", "--"],
+]
         self.moveFunction = {"p": self.allPawnMoves, "r": self.allRookMoves, "n": self.allKnightMoves,
                              "b": self.allBishopMoves, "q": self.allQueenMoves, "k": self.allKingMoves}
         self.move_log = []
-        self.white_to_move = True
+        self.white_to_move = False
+        self.whiteKingPosition = (7,4)
+        self.blackKingPosition = (0,4)
+        self.isCheckMate = False
+        self.isStaleMate = False
 
     def makeMove(self, move):
         self.board[move.start_row][move.start_col] = "--"
         self.board[move.end_row][move.end_col] = move.piece_moved
         self.move_log.append(move)
         self.white_to_move = not self.white_to_move
+        if move.piece_moved == "wk":
+            self.whiteKingPosition = (move.end_row,move.end_col)
+        elif move.piece_moved == "bK":
+            self.blackKingPosition = (move.end_row, move.end_col)
+
 
     def undoMove(self):
         if len(self.move_log) != 0:
@@ -29,11 +49,57 @@ class GameState:
             self.board[move.start_row][move.start_col] = move.piece_moved
             self.board[move.end_row][move.end_col] = move.piece_captured
             self.white_to_move = not self.white_to_move
+            if move.piece_moved == "wk":
+                self.whiteKingPosition = (move.start_row, move.start_col)
+            elif move.piece_moved == "bK":
+                self.blackKingPosition = (move.start_row, move.start_col)
 
     """Method for all moves with checks and stuff"""
 
     def getValidMoves(self):
-        return self.getAllPossibleMoves()
+        all_moves = self.getAllPossibleMoves()
+        """Whenever removing something from a list always start from the end so that you won't miss an element"""
+        for i in range(len(all_moves) - 1,-1,-1):
+            self.makeMove(all_moves[i]) # Make the White move (a)
+            self.white_to_move = not self.white_to_move
+            if self.isCheck():
+                del all_moves[i]
+            self.white_to_move = not self.white_to_move
+            self.undoMove() # Reverse the move you made at (a)
+        if len(all_moves) == 0:
+            if self.isCheck():
+                self.isCheckMate = True
+            else:
+                self.isStaleMate = True
+        else:
+            self.isCheckMate = False
+            self.isStaleMate = False
+        return all_moves
+
+
+    def isCheck(self):
+        if self.white_to_move:
+            return self.squareUnderAttack(self.whiteKingPosition)
+        else:
+            return self.squareUnderAttack(self.blackKingPosition)
+
+    def squareUnderAttack(self,coordinate):
+        self.white_to_move = not self.white_to_move
+        all_moves = self.getAllPossibleMoves()
+        self.white_to_move = not self.white_to_move
+        for move in all_moves:  # check if any black move checks white king
+            if coordinate == (move.end_row, move.end_col):
+                return True
+        return False
+
+
+
+
+
+
+
+
+
 
     """All possible moves"""
 
@@ -225,17 +291,13 @@ class GameState:
             if self.withInChessBoard(end_row, end_col):
                 if self.white_to_move:
                     if self.board[end_row][end_col][0] == "b":
-                        print("1")
                         moves.append(Move((r, c), (end_row, end_col), self.board))
                     elif self.board[end_row][end_col] == "--":
-                        print("2")
                         moves.append(Move((r, c), (end_row, end_col), self.board))
                 else:
                     if self.board[end_row][end_col][0] == "w":
-                        print("3")
                         moves.append(Move((r, c), (end_row, end_col), self.board))
                     elif self.board[end_row][end_col] == "--":
-                        print("4")
                         moves.append(Move((r, c), (end_row, end_col), self.board))
 
     def allQueenMoves(self, r, c, moves):
@@ -243,7 +305,29 @@ class GameState:
         self.allBishopMoves(r, c, moves)
 
     def allKingMoves(self, r, c, moves):
-        pass
+        directions = ((-1,-1),(-1,0),(-1,1),(1,-1),(1,0),(1,1),(0,-1),(0,1))
+        if self.white_to_move:
+            for d in directions:
+                end_row = r + d[0]
+                end_col = c + d[1]
+                if self.withInChessBoard(end_row,end_col):
+                    if self.board[end_row][end_col] == "--":
+                        moves.append(Move((r, c), (end_row, end_col), self.board))
+                    elif self.board[end_row][end_col][0] == "b":
+                        moves.append(Move((r, c), (end_row, end_col), self.board))
+        else:
+            for d in directions:
+                end_row = r + d[0]
+                end_col = c + d[1]
+                if self.withInChessBoard(end_row,end_col):
+                    if self.board[end_row][end_col] == "--":
+                        moves.append(Move((r, c), (end_row, end_col), self.board))
+                    elif self.board[end_row][end_col][0] == "w":
+                        moves.append(Move((r, c), (end_row, end_col), self.board))
+
+
+
+
 
     def withInChessBoard(self, r, c):
         return 0 <= r < 8 and 0 <= c < 8

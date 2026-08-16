@@ -59,12 +59,13 @@ def main():
                     """Move object created"""
                     move = chess_engine.Move(player_click[0], player_click[1], gs.board)
                     """If move is valid move"""
-                    print(move.getChessNotation())
                     if move in valid_moves:
                         gs.makeMove(move)
                         move_made = True
-                    player_click = []
-                    square_selected = ()
+                        player_click = []
+                        square_selected = ()
+                    else:
+                        player_click = [square_selected]
         """Move made is true which game state change generate new valid moves"""
         if move_made:
             valid_moves = gs.getValidMoves()
