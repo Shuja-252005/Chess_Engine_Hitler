@@ -8,7 +8,7 @@ class GameState:
                       ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
                       ["--", "--", "--", "--", "--", "--", "--", "--"],
                       ["--", "--", "--", "--", "--", "--", "--", "--"],
-                      ["--", "wr", "--", "--", "--", "--", "bP", "--"],
+                      ["--", "wr", "--", "--", "--", "--", "wp", "--"],
                       ["--", "--", "--", "--", "--", "--", "--", "--"],
                       ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
                       ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"], ]
@@ -126,32 +126,75 @@ class GameState:
                 if self.board[r + 1][c + 1][0] == "w":
                     moves.append(Move((r, c), (r + 1, c + 1), self.board))
 
+    """Shuja Rook Moves"""
+    # def allRookMoves(self,r,c,moves):
+    #     if self.white_to_move and self.board[r][c][0] == "w":
+    #         changing_square = c
+    #         while changing_square + 1 < 8:# right Moves
+    #             changing_square += 1
+    #             if self.board[r][changing_square][0] == "w": #If white pawn dont add that square
+    #                 break
+    #             elif self.board[r][changing_square][0] == "b": # if black pawn add that move
+    #                 moves.append(Move((r, c), (r, changing_square), self.board))
+    #                 break
+    #             else: # if nothing add that move
+    #                 moves.append(Move((r, c), (r, changing_square), self.board))
+    #
+    #         changing_square = c
+    #         while changing_square - 1 >= 0:# Left Moves
+    #             changing_square -= 1
+    #             if self.board[r][changing_square][0] == "w": #If white pawn dont add that square
+    #                 break
+    #             elif self.board[r][changing_square][0] == "b": # if black pawn add that move
+    #                 moves.append(Move((r, c), (r, changing_square), self.board))
+    #                 break
+    #             else: # if nothing add that move
+    #                 moves.append(Move((r, c), (r, changing_square), self.board))
+    #
+    #         changing_square = r
+    #         while changing_square - 1 >= 0:# Up Moves
+    #             changing_square -= 1
+    #             if self.board[changing_square][c][0] == "w": #If white pawn dont add that square
+    #                 break
+    #             elif self.board[changing_square][c][0] == "b": # if black pawn add that move
+    #                 moves.append(Move((r, c), (changing_square, c), self.board))
+    #                 break
+    #             else: # if nothing add that move
+    #                 moves.append(Move((r, c), (changing_square, c), self.board))
+    #
+    #         changing_square = r
+    #         while changing_square + 1 < 8:  # Down Moves
+    #             changing_square += 1
+    #             if self.board[changing_square][c][0] == "w":  # If white pawn dont add that square
+    #                 break
+    #             elif self.board[changing_square][c][0] == "b":  # if black pawn add that move
+    #                 moves.append(Move((r, c), (changing_square, c), self.board))
+    #                 break
+    #             else:  # if nothing add that move
+    #                 moves.append(Move((r, c), (changing_square, c), self.board))
+    #
+    #     elif not self.white_to_move and self.board[r][c][0] == "b":
 
+    """Video Rook Moves"""
     def allRookMoves(self,r,c,moves):
-        if self.white_to_move and self.board[r][c][0] == "w":
-            changing_square = c
-            while changing_square + 1 < 8:# right Moves
-                print("Ahmed")
-                changing_square += 1
-                if self.board[r][changing_square][0] == "w": #If white pawn dont add that square
-                    break
-                elif self.board[r][changing_square][0] == "b": # if black pawn add that move
-                    moves.append(Move((r, c), (r, changing_square), self.board))
-                    break
-                else: # if nothing add that move
-                    moves.append(Move((r, c), (r, changing_square), self.board))
+        direction = ((-1,0),(1,0),(0,1),(0,-1))
+        enemy_color = "b" if self.white_to_move else "w"
+        for d in direction:
+            for i in range(1,8):
+                end_row = r + d[0] * i
+                end_col = c + d[1] * i
+                if 0 <= end_row < 8 and 0 <= end_col < 8:
+                    if self.board[end_row][end_col] == "--":
+                        moves.append(Move((r,c),(end_row,end_col),self.board))
+                    elif self.board[end_row][end_col][0] == enemy_color:
+                        moves.append(Move((r, c), (end_row, end_col), self.board))
+                        break
+                    else:
+                        break # if a friendly piece present
+                else:
+                    break # Off the chess board
 
-            changing_square = c
-            while changing_square - 1 >= 0:# Left Moves
-                print("shuja")
-                changing_square -= 1
-                if self.board[r][changing_square][0] == "w": #If white pawn dont add that square
-                    break
-                elif self.board[r][changing_square][0] == "b": # if black pawn add that move
-                    moves.append(Move((r, c), (r, changing_square), self.board))
-                    break
-                else: # if nothing add that move
-                    moves.append(Move((r, c), (r, changing_square), self.board))
+
 
 
 
