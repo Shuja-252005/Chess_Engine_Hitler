@@ -6,13 +6,14 @@ class GameState:
     def __init__(self):
         self.board = [["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
                       ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
-                      ["--", "bP", "--", "--", "--", "wp", "--", "--"],
                       ["--", "--", "--", "--", "--", "--", "--", "--"],
-                      ["--", "--", "--", "wq", "--", "--", "--", "--"],
+                      ["--", "--", "--", "--", "--", "--", "--", "--"],
+                      ["--", "--", "--", "--", "--", "--", "--", "--"],
                       ["--", "--", "--", "--", "--", "--", "--", "--"],
                       ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
                       ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"], ]
-        self.moveFunction = {"p":self.allPawnMoves,"r":self.allRookMoves,"n":self.allKnightMoves,"b":self.allBishopMoves,"q":self.allQueenMoves,"k":self.allKingMoves}
+        self.moveFunction = {"p": self.allPawnMoves, "r": self.allRookMoves, "n": self.allKnightMoves,
+                             "b": self.allBishopMoves, "q": self.allQueenMoves, "k": self.allKingMoves}
         self.move_log = []
         self.white_to_move = True
 
@@ -43,7 +44,7 @@ class GameState:
                 if self.white_to_move and self.board[r][c][0] == "w":
                     piece = self.board[r][c]
                     kind = piece[1].lower()
-                    self.moveFunction[kind](r,c,moves)
+                    self.moveFunction[kind](r, c, moves)
                 elif not self.white_to_move and self.board[r][c][0] == "b":
                     piece = self.board[r][c]
                     kind = piece[1].lower()
@@ -102,29 +103,30 @@ class GameState:
     #             moves.append(move2)
 
     """All Pawn moves Video"""
-    def allPawnMoves(self,r,c,moves):
+
+    def allPawnMoves(self, r, c, moves):
         if self.white_to_move and self.board[r][c][0] == "w":
             if self.board[r - 1][c] == "--":
-                moves.append(Move((r,c),(r-1,c),self.board))
+                moves.append(Move((r, c), (r - 1, c), self.board))
                 if r == 6:
-                    if self.board[r-2][c] == "--":
+                    if self.board[r - 2][c] == "--":
                         moves.append(Move((r, c), (r - 2, c), self.board))
-            if c + 1 < 8: # right diagonal
+            if c + 1 < 8:  # right diagonal
                 if self.board[r - 1][c + 1][0] == "b":
                     moves.append(Move((r, c), (r - 1, c + 1), self.board))
-            if c - 1 >= 0: # Left diagonal
+            if c - 1 >= 0:  # Left diagonal
                 if self.board[r - 1][c - 1][0] == "b":
                     moves.append(Move((r, c), (r - 1, c - 1), self.board))
         elif not self.white_to_move and self.board[r][c][0] == "b":
             if self.board[r + 1][c] == "--":
-                moves.append(Move((r,c),(r + 1,c),self.board))
+                moves.append(Move((r, c), (r + 1, c), self.board))
                 if r == 1:
                     if self.board[r + 2][c] == "--":
                         moves.append(Move((r, c), (r + 2, c), self.board))
-            if c - 1 >= 0: # Left diagonal
+            if c - 1 >= 0:  # Left diagonal
                 if self.board[r + 1][c - 1][0] == "w":
                     moves.append(Move((r, c), (r + 1, c - 1), self.board))
-            if c + 1 < 8: # Right diagonal
+            if c + 1 < 8:  # Right diagonal
                 if self.board[r + 1][c + 1][0] == "w":
                     moves.append(Move((r, c), (r + 1, c + 1), self.board))
 
@@ -178,33 +180,15 @@ class GameState:
     #     elif not self.white_to_move and self.board[r][c][0] == "b":
 
     """Video Rook Moves"""
-    def allRookMoves(self,r,c,moves):
-        direction = ((-1,0),(1,0),(0,1),(0,-1))
-        enemy_color = "b" if self.white_to_move else "w"
-        for d in direction:
-            for i in range(1,8):
-                end_row = r + d[0] * i
-                end_col = c + d[1] * i
-                if self.withInChessBoard(end_row,end_col):
-                    if self.board[end_row][end_col] == "--":
-                        moves.append(Move((r,c),(end_row,end_col),self.board))
-                    elif self.board[end_row][end_col][0] == enemy_color:
-                        moves.append(Move((r, c), (end_row, end_col), self.board))
-                        break
-                    else:
-                        break # if a friendly piece present
-                else:
-                    break # Off the chess board
 
-
-    def allBishopMoves(self,r,c,moves):
-        direction = ((-1, -1), (1, 1), (1, -1), (-1, 1)) # Top Left, Bottom Right, Bottom Left, Top Right
+    def allRookMoves(self, r, c, moves):
+        direction = ((-1, 0), (1, 0), (0, 1), (0, -1))
         enemy_color = "b" if self.white_to_move else "w"
         for d in direction:
             for i in range(1, 8):
                 end_row = r + d[0] * i
                 end_col = c + d[1] * i
-                if self.withInChessBoard(end_row,end_col):
+                if self.withInChessBoard(end_row, end_col):
                     if self.board[end_row][end_col] == "--":
                         moves.append(Move((r, c), (end_row, end_col), self.board))
                     elif self.board[end_row][end_col][0] == enemy_color:
@@ -215,15 +199,50 @@ class GameState:
                 else:
                     break  # Off the chess board
 
+    def allBishopMoves(self, r, c, moves):
+        direction = ((-1, -1), (1, 1), (1, -1), (-1, 1))  # Top Left, Bottom Right, Bottom Left, Top Right
+        enemy_color = "b" if self.white_to_move else "w"
+        for d in direction:
+            for i in range(1, 8):
+                end_row = r + d[0] * i
+                end_col = c + d[1] * i
+                if self.withInChessBoard(end_row, end_col):
+                    if self.board[end_row][end_col] == "--":
+                        moves.append(Move((r, c), (end_row, end_col), self.board))
+                    elif self.board[end_row][end_col][0] == enemy_color:
+                        moves.append(Move((r, c), (end_row, end_col), self.board))
+                        break
+                    else:
+                        break  # if a friendly piece present
+                else:
+                    break  # Off the chess board
 
-    def allKnightMoves(self,r,c,moves):
-        pass
+    def allKnightMoves(self, r, c, moves):
+        directions = ((2, 1), (2, -1), (-2, 1), (-2, -1), (1, 2), (1, -2), (-1, 2), (-1, -2))
+        for d in directions:
+            end_row = r + d[0]
+            end_col = c + d[1]
+            if self.withInChessBoard(end_row, end_col):
+                if self.white_to_move:
+                    if self.board[end_row][end_col][0] == "b":
+                        print("1")
+                        moves.append(Move((r, c), (end_row, end_col), self.board))
+                    elif self.board[end_row][end_col] == "--":
+                        print("2")
+                        moves.append(Move((r, c), (end_row, end_col), self.board))
+                else:
+                    if self.board[end_row][end_col][0] == "w":
+                        print("3")
+                        moves.append(Move((r, c), (end_row, end_col), self.board))
+                    elif self.board[end_row][end_col] == "--":
+                        print("4")
+                        moves.append(Move((r, c), (end_row, end_col), self.board))
 
-    def allQueenMoves(self,r,c,moves):
-        self.allRookMoves(r,c,moves)
-        self.allBishopMoves(r,c,moves)
+    def allQueenMoves(self, r, c, moves):
+        self.allRookMoves(r, c, moves)
+        self.allBishopMoves(r, c, moves)
 
-    def allKingMoves(self,r,c,moves):
+    def allKingMoves(self, r, c, moves):
         pass
 
     def withInChessBoard(self, r, c):
