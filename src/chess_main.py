@@ -63,7 +63,7 @@ def main():
                     if move in valid_moves:
                         gs.makeMove(move)
                         move_made = True
-                    player_click = [square_selected]
+                    player_click = []
                     square_selected = ()
         """Move made is true which game state change generate new valid moves"""
         if move_made:

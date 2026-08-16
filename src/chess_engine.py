@@ -8,10 +8,11 @@ class GameState:
                       ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
                       ["--", "--", "--", "--", "--", "--", "--", "--"],
                       ["--", "--", "--", "--", "--", "--", "--", "--"],
+                      ["--", "wr", "--", "--", "--", "--", "bP", "--"],
                       ["--", "--", "--", "--", "--", "--", "--", "--"],
-                      ["--", "--", "bP", "--", "--", "--", "--", "--"],
                       ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
                       ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"], ]
+        self.moveFunction = {"p":self.allPawnMoves,"r":self.allRookMoves,"n":self.allKnightMoves,"b":self.allBishopMoves,"q":self.allQueenMoves,"k":self.allKingMoves}
         self.move_log = []
         self.white_to_move = True
 
@@ -42,13 +43,8 @@ class GameState:
                 piece = self.board[r][c]
                 if piece == "--":
                     continue
-                color = piece[0]
-                kind = piece[1]
-
-                if (color == "w" and self.white_to_move) or (color == "b" and not self.white_to_move):
-                    """lower() used for both white pawns (p) and black pawns (P)"""
-                    if kind.lower() == "p":
-                        self.allPawnMoves(r, c, moves)
+                kind = piece[1].lower()
+                self.moveFunction[kind](r,c,moves)
 
         return moves
 
@@ -104,7 +100,7 @@ class GameState:
 
     """All Pawn moves Video"""
     def allPawnMoves(self,r,c,moves):
-        if self.white_to_move:
+        if self.white_to_move and self.board[r][c][0] == "w":
             if self.board[r - 1][c] == "--":
                 moves.append(Move((r,c),(r-1,c),self.board))
                 if r == 6:
@@ -116,7 +112,7 @@ class GameState:
             if c - 1 >= 0: # Left diagonal
                 if self.board[r - 1][c - 1][0] == "b":
                     moves.append(Move((r, c), (r - 1, c - 1), self.board))
-        else:
+        elif not self.white_to_move and self.board[r][c][0] == "b":
             if self.board[r + 1][c] == "--":
                 moves.append(Move((r,c),(r + 1,c),self.board))
                 if r == 1:
@@ -130,6 +126,20 @@ class GameState:
                     moves.append(Move((r, c), (r + 1, c + 1), self.board))
 
 
+    def allRookMoves(self,r,c,moves):
+        pass
+
+    def allBishopMoves(self,r,c,moves):
+        pass
+
+    def allKnightMoves(self,r,c,moves):
+        pass
+
+    def allQueenMoves(self,r,c,moves):
+        pass
+
+    def allKingMoves(self,r,c,moves):
+        pass
 
     def withInChessBoard(self, r, c):
         return 0 <= r < 8 and 0 <= c < 8
