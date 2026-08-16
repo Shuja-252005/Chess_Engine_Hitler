@@ -9,7 +9,7 @@ class GameState:
                       ["--", "--", "--", "--", "--", "--", "--", "--"],
                       ["--", "--", "--", "--", "--", "--", "--", "--"],
                       ["--", "--", "--", "--", "--", "--", "--", "--"],
-                      ["--", "--", "bQ", "--", "--", "--", "--", "--"],
+                      ["--", "--", "bP", "--", "--", "--", "--", "--"],
                       ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
                       ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"], ]
         self.move_log = []
@@ -52,55 +52,83 @@ class GameState:
 
         return moves
 
-    """All possible pawn moves"""
-    def allPawnMoves(self, r, c, moves):
-        piece = self.board[r][c]
-        color = piece[0]
+    """All possible pawn moves Shuja"""
+    # def allPawnMoves(self, r, c, moves):
+    #     piece = self.board[r][c]
+    #     color = piece[0]
+    #
+    #     if color == "w":
+    #         first_move = r == 6
+    #         if first_move:
+    #             """First 1 and 2 moves up straight"""
+    #             for i in range(1, 3):
+    #                 """check if move within chess boards and on empty square"""
+    #                 if self.withInChessBoard(r - i, c) and (self.board[r - i][c] == "--"):
+    #                     move = Move((r, c), (r - i, c), self.board)
+    #                     moves.append(move)
+    #         else:
+    #             """Only one move up because already moved"""
+    #             if self.withInChessBoard(r - 1, c) and (self.board[r - 1][c] == "--"):
+    #                 move = Move((r, c), (r - 1, c), self.board)
+    #                 moves.append(move)
+    #         """For Left diagonal move"""
+    #         if self.withInChessBoard(r - 1, c - 1) and self.board[r - 1][c - 1][0] == "b":
+    #             move1 = Move((r, c), (r - 1, c - 1), self.board)
+    #             moves.append(move1)
+    #         """For Right diagonal move"""
+    #         if self.withInChessBoard(r - 1, c + 1) and self.board[r - 1][c + 1][0] == "b":
+    #             move2 = Move((r, c), (r - 1, c + 1), self.board)
+    #             moves.append(move2)
+    #     else:
+    #         first_move = r == 1
+    #         if first_move:
+    #             """First 1 and 2 moves down straight"""
+    #             for i in range(1, 3):
+    #                 """check if move within chess boards and on empty square"""
+    #                 if self.withInChessBoard(r + i, c) and (self.board[r + i][c] == "--"):
+    #                     move = Move((r, c), (r + i, c), self.board)
+    #                     moves.append(move)
+    #         else:
+    #             """Only one move up because already moved"""
+    #             if self.withInChessBoard(r + 1, c) and (self.board[r + 1][c] == "--"):
+    #                 move = Move((r, c), (r + 1, c), self.board)
+    #                 moves.append(move)
+    #         """For Left diagonal move"""
+    #         if self.withInChessBoard(r + 1, c + 1) and self.board[r + 1][c + 1][0] == "w":
+    #             move1 = Move((r, c), (r + 1, c + 1), self.board)
+    #             moves.append(move1)
+    #         """For Right diagonal move"""
+    #         if self.withInChessBoard(r + 1, c - 1) and self.board[r + 1][c - 1][0] == "w":
+    #             move2 = Move((r, c), (r + 1, c - 1), self.board)
+    #             moves.append(move2)
 
-        if color == "w":
-            first_move = r == 6
-            if first_move:
-                """First 1 and 2 moves up straight"""
-                for i in range(1, 3):
-                    """check if move within chess boards and on empty square"""
-                    if self.withInChessBoard(r - i, c) and (self.board[r - i][c] == "--"):
-                        move = Move((r, c), (r - i, c), self.board)
-                        moves.append(move)
-            else:
-                """Only one move up because already moved"""
-                if self.withInChessBoard(r - 1, c) and (self.board[r - 1][c] == "--"):
-                    move = Move((r, c), (r - 1, c), self.board)
-                    moves.append(move)
-            """For Left diagonal move"""
-            if self.withInChessBoard(r - 1, c - 1) and self.board[r - 1][c - 1][0] == "b":
-                move1 = Move((r, c), (r - 1, c - 1), self.board)
-                moves.append(move1)
-            """For Right diagonal move"""
-            if self.withInChessBoard(r - 1, c + 1) and self.board[r - 1][c + 1][0] == "b":
-                move2 = Move((r, c), (r - 1, c + 1), self.board)
-                moves.append(move2)
+    """All Pawn moves Video"""
+    def allPawnMoves(self,r,c,moves):
+        if self.white_to_move:
+            if self.board[r - 1][c] == "--":
+                moves.append(Move((r,c),(r-1,c),self.board))
+                if r == 6:
+                    if self.board[r-2][c] == "--":
+                        moves.append(Move((r, c), (r - 2, c), self.board))
+            if c + 1 < 8: # right diagonal
+                if self.board[r - 1][c + 1][0] == "b":
+                    moves.append(Move((r, c), (r - 1, c + 1), self.board))
+            if c - 1 >= 0: # Left diagonal
+                if self.board[r - 1][c - 1][0] == "b":
+                    moves.append(Move((r, c), (r - 1, c - 1), self.board))
         else:
-            first_move = r == 1
-            if first_move:
-                """First 1 and 2 moves down straight"""
-                for i in range(1, 3):
-                    """check if move within chess boards and on empty square"""
-                    if self.withInChessBoard(r + i, c) and (self.board[r + i][c] == "--"):
-                        move = Move((r, c), (r + i, c), self.board)
-                        moves.append(move)
-            else:
-                """Only one move up because already moved"""
-                if self.withInChessBoard(r + 1, c) and (self.board[r + 1][c] == "--"):
-                    move = Move((r, c), (r + 1, c), self.board)
-                    moves.append(move)
-            """For Left diagonal move"""
-            if self.withInChessBoard(r + 1, c + 1) and self.board[r + 1][c + 1][0] == "w":
-                move1 = Move((r, c), (r + 1, c + 1), self.board)
-                moves.append(move1)
-            """For Right diagonal move"""
-            if self.withInChessBoard(r + 1, c - 1) and self.board[r + 1][c - 1][0] == "w":
-                move2 = Move((r, c), (r + 1, c - 1), self.board)
-                moves.append(move2)
+            if self.board[r + 1][c] == "--":
+                moves.append(Move((r,c),(r + 1,c),self.board))
+                if r == 1:
+                    if self.board[r + 2][c] == "--":
+                        moves.append(Move((r, c), (r + 2, c), self.board))
+            if c - 1 >= 0: # Left diagonal
+                if self.board[r + 1][c - 1][0] == "w":
+                    moves.append(Move((r, c), (r + 1, c - 1), self.board))
+            if c + 1 < 8: # Right diagonal
+                if self.board[r + 1][c + 1][0] == "w":
+                    moves.append(Move((r, c), (r + 1, c + 1), self.board))
+
 
 
     def withInChessBoard(self, r, c):
