@@ -2,7 +2,7 @@ from operator import truediv
 
 
 class GameState:
-
+// Commit just for the streak
     def __init__(self):
         # self.board = \
         #     [["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
